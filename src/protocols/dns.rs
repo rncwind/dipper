@@ -1,4 +1,4 @@
-use crate::util::*;
+use crate::{util::*, ExtractedInfo, KnownProtocol, ProtocolType};
 use nom::{
     bytes::complete::{tag, take},
     combinator::map,
@@ -13,6 +13,22 @@ use tracing::*;
 pub enum DNSType {
     Query,
     Response,
+}
+
+impl KnownProtocol for DNSType {
+    fn extract_info(&self, payload: Vec<u8>) -> ExtractedInfo {
+        ExtractedInfo::DNSQuery(analyse_dns_query(payload))
+    }
+
+    fn classify_proto(payload: Vec<u8>) -> Result<ProtocolType, ()> {
+        if is_dns_query(&payload) {
+            return Ok(ProtocolType::DNS(DNSType::Query));
+        }
+        if is_dns_response(&payload) {
+            return Ok(ProtocolType::DNS(DNSType::Response));
+        }
+        Err(())
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]

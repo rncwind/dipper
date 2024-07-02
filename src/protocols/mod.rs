@@ -1,6 +1,12 @@
 use dns::{DNSType, DNSValue};
 
 mod dns;
+mod ssh;
+
+pub trait KnownProtocol {
+    fn classify_proto(payload: Vec<u8>) -> Result<ProtocolType, ()>;
+    fn extract_info(&self, payload: Vec<u8>) -> ExtractedInfo;
+}
 
 #[derive(Debug)]
 pub enum ProtocolType {
@@ -24,9 +30,8 @@ pub fn extract_info(ptype: ProtocolType, payload: Vec<u8>) -> Option<ExtractedIn
 }
 
 pub fn match_protocol(payload: Vec<u8>) -> Result<ProtocolType, ()> {
-    match dns::is_dns(payload) {
-        Ok(x) => return Ok(ProtocolType::DNS(x)),
-        Err(_) => {}
+    if let Ok(x) = dns::is_dns(payload) {
+        return Ok(ProtocolType::DNS(x));
     };
-    return Err(());
+    Err(())
 }

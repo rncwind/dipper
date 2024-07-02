@@ -31,8 +31,8 @@ fn main() {
         Some(pf) => Capture::from_file(pf).expect("Invalid pcap file provided"),
         None => {
             warn!("Using example.pcap as no pcap was provided");
-            Capture::from_file(PathBuf::from("./pcaps/ssh_test.pcap"))
-                .expect("./pcaps/ssh_test.pcap does not exist")
+            Capture::from_file(PathBuf::from("./pcaps/dns.cap"))
+                .expect("./pcaps/dns.cap does not exist")
         }
     };
     info!("Pcap loaded");
@@ -57,6 +57,9 @@ fn main() {
                             stats.known_packets += 1;
                             trace!("Known packet type found: {:?}", x);
                             let extracted = extract_info(x, sliced.payload.to_vec());
+                            if extracted.is_some() {
+                                stats.analyzed += 1;
+                            }
                             if opt.print_analysis {
                                 info!("{:?}", extracted);
                             }

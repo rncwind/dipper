@@ -11,6 +11,7 @@ pub struct Stats {
     pub unknown_packets: usize,
     pub errored_packets: usize,
     pub empty_payload: usize,
+    pub analyzed: usize,
 }
 
 impl Stats {
@@ -21,6 +22,7 @@ impl Stats {
             unknown_packets: 0,
             errored_packets: 0,
             empty_payload: 0,
+            analyzed: 0,
         }
     }
 
@@ -37,9 +39,10 @@ impl Display for Stats {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "Total: {}\nKnown: {}\nUnknown: {}\nErrored: {}\nEmpty: {}",
+            "Total: {}\nKnown/Analyzed: {}({})\nUnknown: {}\nErrored: {}\nEmpty: {}",
             self.total_packets,
             self.known_packets,
+            self.analyzed,
             self.unknown_packets,
             self.errored_packets,
             self.empty_payload
