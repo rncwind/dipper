@@ -1,4 +1,6 @@
 use dns::{DNSType, DNSValue};
+use log::info;
+use ssh::SSHType;
 
 mod dns;
 mod ssh;
@@ -11,6 +13,7 @@ pub trait KnownProtocol {
 #[derive(Debug)]
 pub enum ProtocolType {
     DNS(DNSType),
+    SSH,
 }
 
 #[derive(Debug)]
@@ -21,17 +24,22 @@ pub enum ExtractedInfo {
 pub fn extract_info(ptype: ProtocolType, payload: Vec<u8>) -> Option<ExtractedInfo> {
     match ptype {
         ProtocolType::DNS(x) => match x {
-            DNSType::Query => {
-                return Some(ExtractedInfo::DNSQuery(dns::analyse_dns_query(payload)));
+            //DNSType::Query => Some(ExtractedInfo::DNSQuery(dns::analyse_dns_query(payload))),
+            DNSType::Query => Some(x.extract_info(payload)),
+            DNSType::Response => {
+                info!("DNS Response processing not handled yet!");
+                None
             }
-            DNSType::Response => return None,
         },
+        ProtocolType::SSH => {
+            todo!()
+        }
     }
 }
 
 pub fn match_protocol(payload: Vec<u8>) -> Result<ProtocolType, ()> {
-    if let Ok(x) = dns::is_dns(payload) {
-        return Ok(ProtocolType::DNS(x));
-    };
+    if let Ok(x) = dns::DNSType::classify_proto(payload) {
+        return Ok(x);
+    }
     Err(())
 }

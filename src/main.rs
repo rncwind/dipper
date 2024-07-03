@@ -61,7 +61,7 @@ fn main() {
                                 stats.analyzed += 1;
                             }
                             if opt.print_analysis {
-                                info!("{:?}", extracted);
+                                println!("{:?}", extracted);
                             }
                         }
                         Err(_) => stats.unknown_packets += 1,
